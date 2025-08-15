@@ -4,7 +4,7 @@ let quotes = [
   { text: "Life is what happens when you're busy making other plans.", category: "Life" }
 ];
 
-// Load quotes from local storage
+// Load from local storage
 if (localStorage.getItem("quotes")) {
   quotes = JSON.parse(localStorage.getItem("quotes"));
 }
@@ -18,10 +18,7 @@ function saveQuotes() {
 // Display random quote
 function showRandomQuote() {
   const selectedCategory = document.getElementById("categoryFilter").value;
-  let filteredQuotes = quotes;
-  if (selectedCategory !== "all") {
-    filteredQuotes = quotes.filter(q => q.category === selectedCategory);
-  }
+  let filteredQuotes = selectedCategory === "all" ? quotes : quotes.filter(q => q.category === selectedCategory);
 
   const quoteDisplay = document.getElementById("quoteDisplay");
   quoteDisplay.innerHTML = "";
@@ -64,7 +61,7 @@ function filterQuotes() {
   showRandomQuote();
 }
 
-// Create Add Quote Form dynamically
+// Create Add Quote Form
 function createAddQuoteForm() {
   const container = document.getElementById("addQuoteContainer");
   container.innerHTML = "";
@@ -97,7 +94,7 @@ function addQuote() {
     quotes.push(newQuote);
     saveQuotes();
     showRandomQuote();
-    postQuoteToServer(newQuote); // send to server
+    postQuoteToServer(newQuote);
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
   } else {
@@ -133,7 +130,7 @@ document.getElementById("importFile").addEventListener("change", (event) => {
   fileReader.readAsText(event.target.files[0]);
 });
 
-// ---------- SERVER SYNC FUNCTIONS ----------
+// ---------- SERVER SYNC ----------
 
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
@@ -163,7 +160,7 @@ async function postQuoteToServer(quote) {
   }
 }
 
-// Sync quotes periodically and resolve conflicts
+// Sync quotes with server and resolve conflicts
 async function syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
   let newQuotes = 0;
@@ -172,3 +169,32 @@ async function syncQuotes() {
     if (!quotes.find(q => q.text === sq.text)) {
       quotes.push(sq);
       newQuotes++;
+    }
+  });
+
+  if (newQuotes > 0) {
+    saveQuotes();
+    showRandomQuote();
+    const notification = document.getElementById("notification");
+    notification.textContent = `${newQuotes} new quotes synced from server!`;
+    setTimeout(() => { notification.textContent = ""; }, 5000);
+  }
+}
+
+// Periodic syncing every 60 seconds
+setInterval(syncQuotes, 60000);
+
+// ---------- INITIAL SETUP ----------
+document.addEventListener("DOMContentLoaded", () => {
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory) document.getElementById("categoryFilter").value = savedCategory;
+
+  populateCategories();
+  showRandomQuote();
+  createAddQuoteForm();
+
+  document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
+  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+
+  syncQuotes(); // initial sync
+});

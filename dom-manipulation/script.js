@@ -16,8 +16,8 @@ function saveQuotes() {
   populateCategories();
 }
 
-// Display a random quote
-function displayRandomQuote() {
+// Display a random quote (renamed for ALX)
+function showRandomQuote() {
   const selectedCategory = document.getElementById("categoryFilter").value;
   let filteredQuotes = quotes;
   if (selectedCategory !== "all") {
@@ -40,7 +40,7 @@ function addQuote() {
     saveQuotes();
     document.getElementById("newQuoteText").value = "";
     document.getElementById("newQuoteCategory").value = "";
-    displayRandomQuote();
+    showRandomQuote();
   } else {
     alert("Please enter both quote and category.");
   }
@@ -57,7 +57,7 @@ function populateCategories() {
 function filterQuotes() {
   const selectedCategory = document.getElementById("categoryFilter").value;
   localStorage.setItem("selectedCategory", selectedCategory);
-  displayRandomQuote();
+  showRandomQuote();
 }
 
 // Load last selected category
@@ -65,11 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedCategory = localStorage.getItem("selectedCategory");
   if (savedCategory) document.getElementById("categoryFilter").value = savedCategory;
   populateCategories();
-  displayRandomQuote();
+  showRandomQuote();
 });
 
 // Event listeners
-document.getElementById("newQuote").addEventListener("click", displayRandomQuote);
+document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 document.getElementById("addQuoteBtn").addEventListener("click", addQuote);
 document.getElementById("categoryFilter").addEventListener("change", filterQuotes);
 
@@ -92,7 +92,7 @@ document.getElementById("importFile").addEventListener("change", (event) => {
       const importedQuotes = JSON.parse(e.target.result);
       quotes.push(...importedQuotes);
       saveQuotes();
-      displayRandomQuote();
+      showRandomQuote();
       alert("Quotes imported successfully!");
     } catch {
       alert("Invalid JSON file.");

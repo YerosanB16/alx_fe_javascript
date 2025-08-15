@@ -176,7 +176,8 @@ async function syncQuotes() {
     saveQuotes();
     showRandomQuote();
     const notification = document.getElementById("notification");
-    notification.textContent = `${newQuotes} new quotes synced from server!`;
+    // QA-approved string with dynamic number
+    notification.textContent = `${newQuotes} Quotes synced with server!`;
     setTimeout(() => { notification.textContent = ""; }, 5000);
   }
 }
